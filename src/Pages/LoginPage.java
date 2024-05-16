@@ -56,7 +56,6 @@ public class LoginPage extends JFrame implements ActionListener {
         add(titleLabel2);
 
         loginButton.addActionListener(this);
-        loginButton.addActionListener(this);
         registerLink.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -70,6 +69,11 @@ public class LoginPage extends JFrame implements ActionListener {
         registerPage.setVisible(true);
         dispose();
     }
+    private void openManagerPage(){
+        ManagerPage managerPage = new ManagerPage();
+        managerPage.setVisible(true);
+        dispose();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -77,7 +81,7 @@ public class LoginPage extends JFrame implements ActionListener {
             String password = new String(passwordField.getPassword());
 
             if (!username.isEmpty() && !password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Login successful!");
+                openManagerPage();
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid credentials!");
             }
