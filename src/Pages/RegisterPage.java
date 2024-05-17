@@ -82,8 +82,6 @@ public class RegisterPage extends JFrame implements ActionListener {
         String password = new String(passwordField.getPassword());
         String email = emailField.getText();
 
-        // In a real application, you would perform registration logic here
-        // For simplicity, let's just display the entered information
         JOptionPane.showMessageDialog(this, "Username: " + username + "\nPassword: " + password + "\nEmail: " + email);
     }
 }
