@@ -16,16 +16,19 @@ public class ManagerPage extends JFrame implements ActionListener {
         JLabel welcomeText = new JLabel("Welcome, Manager!");
         welcomeText.setFont(new Font("Arial",Font.BOLD,48));
         JButton logoutButton = new JButton("Logout");
+        JButton addButton = new JButton("Add Empployee");
 
+        addButton.setBounds(120,400,160,30);
         welcomeText.setBounds(400,50,700,60);
         logoutButton.setBounds(5,5,80,20);
 
         setLayout(null);
         add(welcomeText);
         add(logoutButton);
+        add(addButton);
 
         logoutButton.addActionListener(this);
-
+        addButton.addActionListener(new AddButtonListener());
     }
     private void openLoginPage() {
         LoginPage loginPage = new LoginPage();
@@ -36,5 +39,13 @@ public class ManagerPage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         openLoginPage();
+    }
+    private class AddButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            AddEmployeePage addEmployeePage = new AddEmployeePage();
+            addEmployeePage.setVisible(true);
+            dispose();
+        }
     }
 }

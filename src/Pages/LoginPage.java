@@ -1,18 +1,44 @@
 package Pages;
 
+import com.mysql.cj.xdevapi.Client;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginPage extends JFrame implements ActionListener {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JLabel registerLink;
-
+    private Map<String,String> clientData;
+    private Map<String,String> employeeData;
+    private int tries = 5;
     public LoginPage() {
+        clientData = new HashMap<>();
+        employeeData = new HashMap<>();
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/restaurantmanager", "root",
+                    "restaurantmanager123");
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM USERS");
+
+            while (resultSet.next()) {
+                if(resultSet.getString("type").equals("employee")){
+                    employeeData.put(resultSet.getString("username"),resultSet.getString("password"));
+                }else if(resultSet.getString("type").equals("client")){
+                    clientData.put(resultSet.getString("username"),resultSet.getString("password"));
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
         setTitle("RestaurantManager");
         setSize(400, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -74,15 +100,37 @@ public class LoginPage extends JFrame implements ActionListener {
         managerPage.setVisible(true);
         dispose();
     }
-
+    private void openClientPage(boolean[][] reservedTables){
+        ClientPage clientPage = new ClientPage(reservedTables);
+        clientPage.setVisible(true);
+        dispose();
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
+        boolean[][] reservedTables = {
+                {false, true, false, false, false},
+                {false, false, true, false, false},
+                {true, false, false, false, true},
+                {false, false, false, false, false},
+                {false, true, false, true, false}
+        };
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
 
-            if (!username.isEmpty() && !password.isEmpty()) {
-                openManagerPage();
-            } else {
+            if (!username.isEmpty() && !password.isEmpty() && tries!=0) {
+                if(clientData.containsKey(username) && clientData.get(username).equals(password)){
+                    openClientPage(reservedTables);
+                }else if(employeeData.containsKey(username) && employeeData.get(username).equals(password)) {
+                    openManagerPage();
+                }else if(username.equals("GaborRazvan") && password.equals("razvy99113")){
+                    openManagerPage();
+                }else{
+                    JOptionPane.showMessageDialog(this, "Invalid credentials!");
+                    tries--;
+                }
+            } else if(tries==0){
+                System.exit(1);
+            }else{
                 JOptionPane.showMessageDialog(this, "Invalid credentials!");
             }
 

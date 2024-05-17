@@ -6,14 +6,39 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterPage extends JFrame implements ActionListener {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JTextField emailField;
     private JLabel loginLink;
+    private Map<String,String> clientData;
+    private Map<String,String> employeeData;
 
     public RegisterPage() {
+        clientData = new HashMap<>();
+        employeeData = new HashMap<>();
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/restaurantmanager", "root",
+                    "restaurantmanager123");
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM USERS");
+
+            while (resultSet.next()) {
+                if(resultSet.getString("type").equals("employee")){
+                    employeeData.put(resultSet.getString("username"),resultSet.getString("password"));
+                }else if(resultSet.getString("type").equals("client")){
+                    clientData.put(resultSet.getString("username"),resultSet.getString("password"));
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
         setTitle("RestaurantManager");
         setSize(400, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -82,6 +107,30 @@ public class RegisterPage extends JFrame implements ActionListener {
         String password = new String(passwordField.getPassword());
         String email = emailField.getText();
 
-        JOptionPane.showMessageDialog(this, "Username: " + username + "\nPassword: " + password + "\nEmail: " + email);
+        if(clientData.containsKey(username)){
+            JOptionPane.showMessageDialog(this, "The username already exists, try to login!");
+        }else if(email.matches(".*@gmail\\.com")){
+            String insertSQL = "INSERT INTO USERS (username, password, email, type) VALUES (?, ?, ?, ?)";
+
+                try(Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/restaurantmanager", "root",
+                        "restaurantmanager123");
+                PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
+
+                    preparedStatement.setString(1, username);
+                    preparedStatement.setString(2, password);
+                    preparedStatement.setString(3, email);
+                    preparedStatement.setString(4, "client");
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("A new user was inserted successfully!");
+                    }
+                    openLoginPage();
+            }catch (SQLException f){
+                f.printStackTrace();
+            }
+        }else{
+            JOptionPane.showMessageDialog(this, "Wrong email pattern!!");
+        }
     }
 }
