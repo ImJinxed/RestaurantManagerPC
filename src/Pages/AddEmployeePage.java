@@ -25,7 +25,7 @@ public class AddEmployeePage extends JFrame implements ActionListener {
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
         emailField = new JTextField(20);
-        JButton registerButton = new JButton("Register");
+        JButton registerButton = new JButton("Add Employee");
 
         titleLabel1.setFont(new Font("Palatino",Font.BOLD, 48));
         titleLabel2.setFont(new Font("Palatino",Font.BOLD, 48));
